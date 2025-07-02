@@ -206,6 +206,26 @@
         background: transparent;
         object-fit: contain;
         display: block;
+        /* Hide any controls that might appear */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+      }
+
+      video::-webkit-media-controls {
+        display: none !important;
+      }
+
+      video::-webkit-media-controls-panel {
+        display: none !important;
+      }
+
+      video::-webkit-media-controls-play-button {
+        display: none !important;
+      }
+
+      video::-webkit-media-controls-start-playback-button {
+        display: none !important;
       }
 
       h1 {
@@ -449,6 +469,9 @@
           loop
           muted
           playsinline
+          preload="auto"
+          controls="false"
+          webkit-playsinline
         ></video>
       </div>
       <h1 data-text="وب‌سایت سلامت‌یار پارس در حال بروزرسانی است...">
@@ -512,20 +535,71 @@
     document.addEventListener("DOMContentLoaded", function () {
       var video = document.getElementById("heroVideo");
       if (video) {
+        // Force all necessary attributes
         video.muted = true;
         video.loop = true;
+        video.autoplay = true;
+        video.playsInline = true;
+        video.controls = false;
         video.removeAttribute("controls");
         video.setAttribute("playsinline", "");
         video.setAttribute("autoplay", "");
+        video.setAttribute("muted", "");
+        video.setAttribute("webkit-playsinline", "");
 
-        var playPromise = video.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(function () {
-            setTimeout(function () {
-              video.play();
-            }, 500);
-          });
+        // Hide any potential controls with CSS
+        video.style.pointerEvents = "none";
+
+        // Multiple attempts to play
+        function attemptPlay() {
+          var playPromise = video.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(function () {
+              // If first attempt fails, try again
+              setTimeout(function () {
+                video.muted = true;
+                video.play().catch(function () {
+                  // Final attempt after user interaction
+                  document.addEventListener(
+                    "touchstart",
+                    function () {
+                      video.play();
+                    },
+                    { once: true }
+                  );
+                });
+              }, 100);
+            });
+          }
         }
+
+        // Try to play immediately
+        attemptPlay();
+
+        // Also try when video is loaded
+        video.addEventListener("loadeddata", attemptPlay);
+        video.addEventListener("canplay", attemptPlay);
+
+        // Force play on any user interaction
+        document.addEventListener(
+          "touchstart",
+          function () {
+            if (video.paused) {
+              video.play();
+            }
+          },
+          { passive: true }
+        );
+
+        document.addEventListener(
+          "click",
+          function () {
+            if (video.paused) {
+              video.play();
+            }
+          },
+          { passive: true }
+        );
       }
     });
   </script>
