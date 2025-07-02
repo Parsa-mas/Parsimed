@@ -186,8 +186,8 @@
       }
 
       .lottie-box {
-        width: 200px;
-        height: 200px;
+        width: 280px;
+        height: 280px;
         margin: 0 auto 32px auto;
         background: #f8fafc;
         border-radius: 12px;
@@ -200,8 +200,8 @@
       }
 
       video {
-        width: 160px;
-        height: 160px;
+        width: 240px;
+        height: 240px;
         border-radius: 8px;
         background: transparent;
         object-fit: contain;
@@ -411,12 +411,12 @@
           border-radius: 12px;
         }
         .lottie-box {
-          width: 160px;
-          height: 160px;
+          width: 280px;
+          height: 280px;
         }
         video {
-          width: 120px;
-          height: 120px;
+          width: 240px;
+          height: 240px;
         }
         .phone-number {
           font-size: 1.125rem;
@@ -442,7 +442,14 @@
   <body>
     <div class="container">
       <div class="lottie-box">
-        <video src="g.mp4" autoplay loop muted playsinline></video>
+        <video
+          id="heroVideo"
+          src="g.mp4"
+          autoplay
+          loop
+          muted
+          playsinline
+        ></video>
       </div>
       <h1 data-text="وب‌سایت سلامت‌یار پارس در حال بروزرسانی است...">
         وب‌سایت سلامت‌یار پارس<br />در حال بروزرسانی است...
@@ -501,4 +508,25 @@
       </div>
     </div>
   </body>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var video = document.getElementById("heroVideo");
+      if (video) {
+        video.muted = true;
+        video.loop = true;
+        video.removeAttribute("controls");
+        video.setAttribute("playsinline", "");
+        video.setAttribute("autoplay", "");
+
+        var playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(function () {
+            setTimeout(function () {
+              video.play();
+            }, 500);
+          });
+        }
+      }
+    });
+  </script>
 </html>
